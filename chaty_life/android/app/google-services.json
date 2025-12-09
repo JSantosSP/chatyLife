@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1024763999484",
+    "project_id": "chatylife-b2e05",
+    "storage_bucket": "chatylife-b2e05.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1024763999484:android:d9ca3e1b3ea5837781d379",
+        "android_client_info": {
+          "package_name": "com.chatyLife"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvxNH0LUz8W85R7pOXbk-V0cyPxCBJZC4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1024763999484:android:e8257610f635f7d081d379",
+        "android_client_info": {
+          "package_name": "com.example.chaty_life"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvxNH0LUz8W85R7pOXbk-V0cyPxCBJZC4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
