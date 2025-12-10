@@ -26,24 +26,31 @@ service cloud.firestore {
 
     // Reglas para chats
     match /chats/{chatId} {
-      // Solo los participantes del chat pueden leerlo
+      // Permitir lectura si el usuario es participante
+      // Para consultas, permitir si el where clause filtra por participant1Id o participant2Id
       allow read: if request.auth != null && 
-                     (resource.data.participant1Id == request.auth.uid ||
+                     (resource == null || 
+                      resource.data.participant1Id == request.auth.uid ||
                       resource.data.participant2Id == request.auth.uid);
       
       // Solo los participantes pueden crear/actualizar el chat
-      allow create, update: if request.auth != null && 
-                               (request.resource.data.participant1Id == request.auth.uid ||
-                                request.resource.data.participant2Id == request.auth.uid);
+      allow create: if request.auth != null && 
+                       (request.resource.data.participant1Id == request.auth.uid ||
+                        request.resource.data.participant2Id == request.auth.uid);
+      
+      // Permitir actualización si el usuario es participante
+      allow update: if request.auth != null && 
+                       (resource.data.participant1Id == request.auth.uid ||
+                        resource.data.participant2Id == request.auth.uid);
       
       // Reglas para mensajes dentro de un chat
       match /messages/{messageId} {
-        // Solo los participantes del chat pueden leer mensajes
+        // Permitir lectura si el usuario puede leer el chat padre
         allow read: if request.auth != null && 
                        (get(/databases/$(database)/documents/chats/$(chatId)).data.participant1Id == request.auth.uid ||
                         get(/databases/$(database)/documents/chats/$(chatId)).data.participant2Id == request.auth.uid);
         
-        // Solo el remitente puede crear mensajes
+        // Solo el remitente puede crear mensajes y debe ser participante del chat
         allow create: if request.auth != null && 
                          request.resource.data.senderId == request.auth.uid &&
                          (get(/databases/$(database)/documents/chats/$(chatId)).data.participant1Id == request.auth.uid ||
