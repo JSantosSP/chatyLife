@@ -1,16 +1,83 @@
-# chaty_life
+# ChatyLife
 
-A new Flutter project.
+Una aplicación de chat tipo WhatsApp simplificada construida con Flutter y Firebase.
 
-## Getting Started
+## Características
 
-This project is a starting point for a Flutter application.
+- 🔐 **Autenticación completa**: Registro, inicio de sesión y recuperación de contraseña
+- 👥 **Gestión de contactos**: Buscar usuarios y agregar contactos
+- 💬 **Chat en tiempo real**: Mensajería instantánea con Firestore
+- 📝 **Mensajes de texto**: Envía y recibe mensajes de texto
+- 😀 **Emojis**: Selector de emojis integrado
+- 🖼️ **Imágenes**: Envío de imágenes con almacenamiento temporal y descarga local
+- 🎤 **Audios**: Graba y envía mensajes de audio
+- 🔔 **Notificaciones push**: Notificaciones cuando recibes mensajes nuevos
+- 🔒 **Seguridad**: Reglas de Firestore y Storage configuradas
 
-A few resources to get you started if this is your first Flutter project:
+## Tecnologías
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter** - Framework de desarrollo móvil
+- **Firebase Auth** - Autenticación de usuarios
+- **Cloud Firestore** - Base de datos en tiempo real
+- **ImgBB API / Base64** - Almacenamiento gratuito de archivos (sin Firebase Storage)
+- **Firebase Cloud Messaging** - Notificaciones push
+- **Firebase Functions** - Borrado automático de archivos temporales
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Requisitos
+
+- Flutter SDK 3.10.3 o superior
+- Cuenta de Firebase
+- Android Studio / Xcode para desarrollo
+
+## Instalación
+
+1. Clona el repositorio
+2. Instala las dependencias:
+```bash
+flutter pub get
+```
+
+3. Configura Firebase (ver `README_SETUP.md` para instrucciones detalladas)
+
+4. Ejecuta la aplicación:
+```bash
+flutter run
+```
+
+## Configuración
+
+Consulta `README_SETUP.md` para instrucciones detalladas sobre:
+- Configuración de Firebase
+- Reglas de Firestore
+- Configuración de notificaciones push
+- Permisos de Android e iOS
+- Almacenamiento gratuito (ver `STORAGE_FREE.md`)
+
+## Estructura del Proyecto
+
+```
+lib/
+├── models/          # Modelos de datos
+├── services/        # Servicios de Firebase
+├── screens/         # Pantallas de la aplicación
+└── widgets/         # Componentes reutilizables
+```
+
+## Funcionalidades MVP
+
+✅ Autenticación completa
+✅ Búsqueda y gestión de contactos
+✅ Chat individual en tiempo real
+✅ Mensajes de texto, emojis, imágenes y audios
+✅ Notificaciones push
+✅ Almacenamiento temporal de imágenes
+✅ Descarga local de imágenes y audios
+✅ Reglas de seguridad
+
+## Licencia
+
+Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+
+## Autor
+
+Desarrollado como plantilla base para aplicaciones de chat.
