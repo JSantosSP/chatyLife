@@ -238,7 +238,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener los insets del sistema (botones de navegación)
+    final systemPadding = MediaQuery.of(context).padding;
+    final viewInsets = MediaQuery.of(context).viewInsets;
+    
     return Scaffold(
+      resizeToAvoidBottomInset: true, // Ajusta automáticamente cuando aparece el teclado
       appBar: AppBar(
         title: Row(
           children: [
@@ -257,7 +262,9 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
-      body: Column(
+      body: SafeArea(
+        bottom: true, // Respetar el área inferior (botones de navegación)
+        child: Column(
         children: [
           Expanded(
             child: StreamBuilder<List<MessageModel>>(
@@ -312,18 +319,23 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              boxShadow: [
-                BoxShadow(
-                  offset: const Offset(0, -2),
-                  blurRadius: 4,
-                  color: Colors.black.withOpacity(0.1),
-                ),
-              ],
+          // Contenedor de entrada de mensajes con padding para teclado y botones de navegación
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: viewInsets.bottom, // Espacio para el teclado cuando está abierto
             ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                boxShadow: [
+                  BoxShadow(
+                    offset: const Offset(0, -2),
+                    blurRadius: 4,
+                    color: Colors.black.withOpacity(0.1),
+                  ),
+                ],
+              ),
             child: Row(
               children: [
                 IconButton(
@@ -369,8 +381,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ],
             ),
+            ),
           ),
         ],
+        ),
       ),
     );
   }

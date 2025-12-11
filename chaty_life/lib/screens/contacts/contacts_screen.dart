@@ -162,7 +162,9 @@ class _ContactsScreenState extends State<ContactsScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: SafeArea(
+        bottom: true, // Respetar el área inferior (botones de navegación)
+        child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -195,6 +197,7 @@ class _ContactsScreenState extends State<ContactsScreen> {
                     : _buildContactsList(),
           ),
         ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
