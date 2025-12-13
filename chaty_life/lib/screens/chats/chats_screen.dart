@@ -150,6 +150,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
             }
 
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              final theme = Theme.of(context);
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -157,14 +158,14 @@ class _ChatsScreenState extends State<ChatsScreen> {
                     Icon(
                       Icons.chat_bubble_outline,
                       size: 64,
-                      color: Colors.grey[400],
+                      color: theme.colorScheme.onSurface.withOpacity(0.4),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'No hay chats aún',
                       style: TextStyle(
                         fontSize: 18,
-                        color: Colors.grey[600],
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -172,7 +173,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                       'Toca el botón + para buscar contactos',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[500],
+                        color: theme.colorScheme.onSurface.withOpacity(0.5),
                       ),
                     ),
                   ],
@@ -227,8 +228,8 @@ class _ChatsScreenState extends State<ChatsScreen> {
                               ? FontWeight.w500
                               : FontWeight.normal,
                           color: unreadCount > 0
-                              ? Colors.black87
-                              : Colors.grey[600],
+                              ? Theme.of(context).colorScheme.onSurface
+                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                       trailing: Column(
@@ -239,7 +240,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                             _formatLastMessageTime(chat.lastMessageTime),
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                           if (unreadCount > 0) ...[

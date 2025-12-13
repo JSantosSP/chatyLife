@@ -417,7 +417,7 @@ class _ChatScreenState extends State<ChatScreen> {
         bottom: true,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).scaffoldBackgroundColor,
             image: _chatTheme?.wallpaperPath != null
                 ? DecorationImage(
                     image: FileImage(File(_chatTheme!.wallpaperPath!)),
@@ -440,7 +440,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: Text(
                         'No hay mensajes aún',
                         style: TextStyle(
-                          color: _chatTheme?.otherTextColor ?? Colors.black87,
+                          color: _chatTheme?.otherTextColor ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     );
@@ -504,12 +504,12 @@ class _ChatScreenState extends State<ChatScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Theme.of(context).colorScheme.surface,
                   boxShadow: [
                     BoxShadow(
                       offset: const Offset(0, -2),
                       blurRadius: 4,
-                      color: Colors.black.withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
                     ),
                   ],
                 ),

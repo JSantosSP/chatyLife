@@ -153,6 +153,17 @@ class _MyAppState extends State<MyApp> {
         },
       ),
       scaffoldBackgroundColor: const Color(0xFFFEEDCE),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF0080FF), // Azul eléctrico
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF0080FF), // Azul eléctrico
+          foregroundColor: Colors.white,
+        ),
+      ),
     );
   }
 
@@ -179,6 +190,12 @@ class _MyAppState extends State<MyApp> {
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: Color(0xFF00FF80), // Verde eléctrico
         foregroundColor: Colors.white,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF0080FF), // Azul eléctrico
+          foregroundColor: Colors.white,
+        ),
       ),
     );
   }

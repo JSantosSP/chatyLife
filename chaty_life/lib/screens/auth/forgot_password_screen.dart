@@ -91,10 +91,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   else
                     Column(
                       children: [
-                        const Text(
+                        Text(
                           'Ingresa tu email y te enviaremos un enlace para recuperar tu contraseña.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          ),
                         ),
                         const SizedBox(height: 32),
                         TextFormField(

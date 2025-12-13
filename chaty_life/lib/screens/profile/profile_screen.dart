@@ -169,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _user!.uid,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[600],
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               ),
             ),
             const SizedBox(height: 32),
