@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:io';
@@ -7,7 +8,20 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
-    // Solicitar permisos
+    // Configurar notificaciones locales primero
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await _localNotifications.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: _onNotificationTapped,
+    );
+
+    // Solicitar permisos (ya se hace en main.dart, pero por si acaso)
     NotificationSettings settings = await _messaging.requestPermission(
       alert: true,
       badge: true,
@@ -15,36 +29,23 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // Configurar notificaciones locales
-      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-      const iosSettings = DarwinInitializationSettings();
-      const initSettings = InitializationSettings(
-        android: androidSettings,
-        iOS: iosSettings,
-      );
-
-      await _localNotifications.initialize(
-        initSettings,
-        onDidReceiveNotificationResponse: _onNotificationTapped,
-      );
-
-      // Obtener token FCM
-      final token = await _messaging.getToken();
-      if (token != null) {
-        // Guardar token en Firestore (se hará desde el servicio de autenticación)
-      }
+      // Escuchar cambios en el token FCM
+      _messaging.onTokenRefresh.listen((newToken) {
+        print('🔄 Token FCM actualizado: ${newToken.substring(0, 20)}...');
+        // El token se actualizará en Firestore desde main.dart
+      });
 
       // Escuchar mensajes en primer plano
-      FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('📨 Notificación recibida en primer plano: ${message.notification?.title}');
+        _handleForegroundMessage(message);
+      });
 
-      // Escuchar cuando se toca una notificación
-      FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
-
-      // Manejar notificación cuando la app está cerrada
-      final initialMessage = await _messaging.getInitialMessage();
-      if (initialMessage != null) {
-        _handleNotificationTap(initialMessage);
-      }
+      // Escuchar cuando se toca una notificación (app en background)
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        print('👆 Notificación tocada (app en background): ${message.data}');
+        _handleNotificationTap(message);
+      });
     }
   }
 
@@ -53,20 +54,20 @@ class NotificationService {
   }
 
   void _handleNotificationTap(RemoteMessage message) {
-    // Navegar al chat correspondiente
-    // Esto se manejará desde el main.dart o un router
-    final chatId = message.data['chatId'];
-    if (chatId != null) {
-      // Navegar al chat
+    // La navegación se maneja desde main.dart
+    // Este método se puede usar para lógica adicional si es necesario
+    if (kDebugMode) {
+      print('📱 NotificationService: Notificación tocada - ${message.data}');
     }
   }
 
   void _onNotificationTapped(NotificationResponse response) {
-    // Manejar tap en notificación local
+    // Manejar tap en notificación local (mostrada en primer plano)
     final chatId = response.payload;
-    if (chatId != null) {
-      // Navegar al chat
+    if (kDebugMode) {
+      print('📱 NotificationService: Notificación local tocada - chatId: $chatId');
     }
+    // La navegación se manejará desde main.dart usando el payload
   }
 
   Future<void> _showLocalNotification(RemoteMessage message) async {

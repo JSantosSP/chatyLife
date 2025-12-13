@@ -1,32 +1,113 @@
 /**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * Cloud Functions para Firebase - ChatyLife
+ * Envío automático de notificaciones push cuando se crea un nuevo mensaje
+ * 
+ * Compatible con plan Blaze
+ * Usando Cloud Functions v1 (más simple, no requiere Eventarc)
  */
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+// Inicializar Firebase Admin SDK
+admin.initializeApp();
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+/**
+ * Función que se ejecuta automáticamente cuando se crea un nuevo mensaje
+ * Envía una notificación push al usuario receptor
+ * 
+ * Trigger: chats/{chatId}/messages/{messageId} onCreate
+ */
+exports.sendMessageNotification = functions.firestore
+    .document("chats/{chatId}/messages/{messageId}")
+    .onCreate(async (snap, context) => {
+      const message = snap.data();
+      const chatId = context.params.chatId;
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+      if (!message) {
+        console.log("Mensaje vacío, no se enviará notificación");
+        return null;
+      }
+
+      const receiverId = message.receiverId;
+
+      if (!receiverId) {
+        console.log("No hay receptor especificado");
+        return null;
+      }
+
+      try {
+        // Obtener información del usuario receptor
+        const receiverDoc = await admin.firestore()
+            .collection("users")
+            .doc(receiverId)
+            .get();
+
+        if (!receiverDoc.exists) {
+          console.log(`Usuario receptor ${receiverId} no encontrado`);
+          return null;
+        }
+
+        const receiverData = receiverDoc.data();
+        const fcmToken = receiverData && receiverData.fcmToken;
+
+        if (!fcmToken) {
+          console.log(`Usuario ${receiverId} no tiene token FCM`);
+          return null;
+        }
+
+        // Obtener información del usuario emisor
+        const senderDoc = await admin.firestore()
+            .collection("users")
+            .doc(message.senderId)
+            .get();
+
+        const senderData = senderDoc.exists ? senderDoc.data() : null;
+        const senderName = (senderData && senderData.username) || "Alguien";
+
+        // Preparar el contenido de la notificación según el tipo de mensaje
+        let notificationTitle = senderName;
+        let notificationBody = message.content || "";
+
+        if (message.type === "image") {
+          notificationBody = "📷 Envió una imagen";
+        } else if (message.type === "audio") {
+          notificationBody = "🎤 Envió un audio";
+        } else if (message.type === "emoji") {
+          notificationBody = message.content || "😊";
+        }
+
+        // Crear el payload de la notificación
+        const payload = {
+          notification: {
+            title: notificationTitle,
+            body: notificationBody,
+            sound: "default",
+          },
+          data: {
+            chatId: chatId,
+            senderId: message.senderId,
+            type: "message",
+          },
+          token: fcmToken,
+        };
+
+        // Enviar la notificación usando Firebase Cloud Messaging
+        const response = await admin.messaging().send(payload);
+
+        console.log("✅ Notificación enviada exitosamente", {
+          chatId: chatId,
+          receiverId: receiverId,
+          messageId: response,
+        });
+
+        return response;
+      } catch (error) {
+        console.error("❌ Error al enviar notificación", {
+          error: error.message,
+          chatId: chatId,
+          receiverId: receiverId,
+        });
+        return null;
+      }
+    });

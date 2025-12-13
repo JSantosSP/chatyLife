@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,25 +15,56 @@ import 'screens/chat/chat_screen.dart';
 // ValueNotifier global para el tema
 final themeNotifier = ValueNotifier<bool>(false);
 
-// Handler para notificaciones en background
+// Handler para notificaciones en background (top-level function)
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
+  // Log para debugging
+  if (kDebugMode) {
+    print("📨 Handling a background message: ${message.messageId}");
+    print('Message data: ${message.data}');
+    print('Message notification: ${message.notification?.title}');
+    print('Message notification: ${message.notification?.body}');
+  }
+  
+  // Aquí puedes procesar el mensaje en segundo plano
+  // Por ejemplo, guardar en base de datos local, actualizar contadores, etc.
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Flutter maneja automáticamente los insets del sistema por defecto
-  // No necesitamos configurar nada adicional
   
   // Inicializar Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Configurar handler de notificaciones en background
+  // Configurar handler de notificaciones en background (debe ser top-level)
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // Solicitar permisos de notificación (para iOS y Android 13+)
+  final NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  if (kDebugMode) {
+    print('🔔 Permisos de notificación: ${settings.authorizationStatus}');
+  }
+
+  // Obtener y mostrar el token FCM (para debugging)
+  final String? token = await FirebaseMessaging.instance.getToken();
+  if (kDebugMode && token != null) {
+    print('✅ FCM Token obtenido: ${token.substring(0, 20)}...');
+  }
 
   // Inicializar servicio de notificaciones
   final notificationService = NotificationService();
@@ -171,27 +203,34 @@ class _AuthWrapperState extends State<AuthWrapper> {
   }
 
   Future<void> _setupNotifications() async {
-    // Escuchar notificaciones cuando la app está abierta
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // La notificación se maneja automáticamente por NotificationService
-    });
-
-    // Manejar cuando se toca una notificación
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _handleNotificationTap(message);
-    });
-
     // Manejar notificación cuando la app se abre desde cerrada
     final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
+      if (kDebugMode) {
+        print('🚀 App abierta desde notificación: ${initialMessage.data}');
+      }
       _handleNotificationTap(initialMessage);
     }
+
+    // Escuchar cambios en el token FCM y actualizar en Firestore
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      final user = _authService.currentUser;
+      if (user != null) {
+        if (kDebugMode) {
+          print('🔄 Actualizando token FCM en Firestore para usuario: ${user.uid}');
+        }
+        await _firestoreService.updateUser(user.uid, {'fcmToken': newToken});
+      }
+    });
 
     // Actualizar token FCM cuando el usuario inicia sesión
     _authService.authStateChanges.listen((user) async {
       if (user != null) {
         final token = await _notificationService.getFCMToken();
         if (token != null) {
+          if (kDebugMode) {
+            print('💾 Guardando token FCM en Firestore para usuario: ${user.uid}');
+          }
           await _firestoreService.updateUser(user.uid, {'fcmToken': token});
         }
       }
@@ -202,16 +241,25 @@ class _AuthWrapperState extends State<AuthWrapper> {
     final chatId = message.data['chatId'];
     final senderId = message.data['senderId'];
     
-    if (chatId != null && senderId != null) {
+    if (kDebugMode) {
+      print('👆 Notificación tocada - chatId: $chatId, senderId: $senderId');
+    }
+    
+    if (chatId != null) {
       // Navegar al chat cuando se toca la notificación
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => ChatScreen(
-            chatId: chatId,
-            currentUserId: _authService.currentUser?.uid ?? '',
-          ),
-        ),
-      );
+      // Usar un pequeño delay para asegurar que el contexto esté disponible
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted && context.mounted && _authService.currentUser != null) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ChatScreen(
+                chatId: chatId,
+                currentUserId: _authService.currentUser!.uid,
+              ),
+            ),
+          );
+        }
+      });
     }
   }
 
