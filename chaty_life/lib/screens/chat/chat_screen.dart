@@ -9,9 +9,12 @@ import 'package:uuid/uuid.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../models/user_model.dart';
 import '../../models/message_model.dart';
+import '../../models/chat_theme_model.dart';
 import '../../services/firestore_service.dart';
 import '../../services/storage_service.dart';
+import '../../services/chat_theme_service.dart';
 import '../../widgets/message_bubble.dart';
+import 'chat_customization_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -35,15 +38,44 @@ class _ChatScreenState extends State<ChatScreen> {
   final _firestoreService = FirestoreService();
   final _storageService = StorageService();
   final _audioRecorder = FlutterSoundRecorder();
+  final _themeService = ChatThemeService();
   bool _isRecording = false;
   bool _showEmojiPicker = false;
   String? _recordingPath;
   final Set<String> _downloadingImages = {}; // Track imágenes en proceso de descarga
+  ChatTheme? _chatTheme;
 
   @override
   void initState() {
     super.initState();
     _resetUnreadCount();
+    _loadChatTheme();
+  }
+
+  Future<void> _loadChatTheme() async {
+    final theme = await _themeService.loadChatTheme(widget.chatId);
+    if (mounted) {
+      setState(() {
+        _chatTheme = theme;
+      });
+    }
+  }
+
+  Future<void> _openCustomizationScreen() async {
+    final result = await Navigator.of(context).push<ChatTheme>(
+      MaterialPageRoute(
+        builder: (context) => ChatCustomizationScreen(
+          chatId: widget.chatId,
+          currentTheme: _chatTheme,
+        ),
+      ),
+    );
+
+    if (result != null && mounted) {
+      setState(() {
+        _chatTheme = result;
+      });
+    }
   }
 
   @override
@@ -320,59 +352,85 @@ class _ChatScreenState extends State<ChatScreen> {
             Text(widget.contactUser?.username ?? 'Usuario'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.palette),
+            onPressed: _openCustomizationScreen,
+            tooltip: 'Personalizar chat',
+          ),
+        ],
       ),
       body: SafeArea(
         bottom: true, // Respetar el área inferior (botones de navegación)
-        child: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<List<MessageModel>>(
-              stream: _firestoreService.getMessages(widget.chatId),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text('No hay mensajes aún'),
-                  );
-                }
-
-                final messages = snapshot.data!.reversed.toList();
-
-                return ListView.builder(
-                  controller: _scrollController,
-                  reverse: true,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    final isMe = message.senderId == widget.currentUserId;
-                    
-                    // Descargar imagen automáticamente solo si es recibida, no descargada y no está en proceso
-                    if (!isMe && 
-                        message.type == MessageType.image && 
-                        !message.imageDownloaded &&
-                        !_downloadingImages.contains(message.id)) {
-                      // Usar un pequeño delay para evitar múltiples descargas simultáneas
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        if (mounted) {
-                          _downloadAndSaveImage(message);
-                        }
-                      });
-                    }
-
-                    return MessageBubble(
-                      message: message,
-                      isMe: isMe,
-                      onImageTap: () => _downloadAndSaveImage(message),
-                    );
-                  },
-                );
-              },
-            ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            image: _chatTheme?.wallpaperPath != null
+                ? DecorationImage(
+                    image: FileImage(File(_chatTheme!.wallpaperPath!)),
+                    fit: _chatTheme?.wallpaperFit ?? BoxFit.cover,
+                  )
+                : null,
           ),
+          child: Column(
+          children: [
+            Expanded(
+              child: StreamBuilder<List<MessageModel>>(
+                stream: _firestoreService.getMessages(widget.chatId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No hay mensajes aún',
+                        style: TextStyle(
+                          color: _chatTheme?.otherTextColor ?? Colors.black87,
+                        ),
+                      ),
+                    );
+                  }
+
+                  final messages = snapshot.data!;
+
+                  return ListView.builder(
+                    controller: _scrollController,
+                    reverse: true,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final message = messages[index];
+                      final isMe = message.senderId == widget.currentUserId;
+                      
+                      // Descargar imagen automáticamente solo si es recibida, no descargada y no está en proceso
+                      if (!isMe && 
+                          message.type == MessageType.image && 
+                          !message.imageDownloaded &&
+                          !_downloadingImages.contains(message.id)) {
+                        // Usar un pequeño delay para evitar múltiples descargas simultáneas
+                        Future.delayed(const Duration(milliseconds: 100), () {
+                          if (mounted) {
+                            _downloadAndSaveImage(message);
+                          }
+                        });
+                      }
+
+                      return MessageBubble(
+                        message: message,
+                        isMe: isMe,
+                        onImageTap: () => _downloadAndSaveImage(message),
+                        myBubbleColor: _chatTheme?.myBubbleColor,
+                        otherBubbleColor: _chatTheme?.otherBubbleColor,
+                        myTextColor: _chatTheme?.myTextColor,
+                        otherTextColor: _chatTheme?.otherTextColor,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
           if (_showEmojiPicker)
             SizedBox(
               height: 250,
@@ -450,7 +508,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             ),
           ),
-        ],
+          ],
+          ),
         ),
       ),
     );

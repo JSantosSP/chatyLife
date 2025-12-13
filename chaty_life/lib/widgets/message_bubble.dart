@@ -11,12 +11,20 @@ class MessageBubble extends StatefulWidget {
   final MessageModel message;
   final bool isMe;
   final VoidCallback? onImageTap;
+  final Color? myBubbleColor;
+  final Color? otherBubbleColor;
+  final Color? myTextColor;
+  final Color? otherTextColor;
 
   const MessageBubble({
     super.key,
     required this.message,
     required this.isMe,
     this.onImageTap,
+    this.myBubbleColor,
+    this.otherBubbleColor,
+    this.myTextColor,
+    this.otherTextColor,
   });
 
   @override
@@ -86,7 +94,9 @@ class _MessageBubbleState extends State<MessageBubble> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: widget.isMe ? Colors.deepPurple : Colors.grey[300],
+                color: widget.isMe 
+                    ? (widget.myBubbleColor ?? Colors.deepPurple)
+                    : (widget.otherBubbleColor ?? Colors.grey[300]),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -96,7 +106,9 @@ class _MessageBubbleState extends State<MessageBubble> {
                     Text(
                       widget.message.content,
                       style: TextStyle(
-                        color: widget.isMe ? Colors.white : Colors.black87,
+                        color: widget.isMe 
+                            ? (widget.myTextColor ?? Colors.white)
+                            : (widget.otherTextColor ?? Colors.black87),
                       ),
                     )
                   else if (widget.message.type == MessageType.image)
@@ -165,7 +177,9 @@ class _MessageBubbleState extends State<MessageBubble> {
                         IconButton(
                           icon: Icon(
                             _isPlaying ? Icons.pause : Icons.play_arrow,
-                            color: widget.isMe ? Colors.white : Colors.black87,
+                            color: widget.isMe 
+                                ? (widget.myTextColor ?? Colors.white)
+                                : (widget.otherTextColor ?? Colors.black87),
                           ),
                           onPressed: () => _playAudio(widget.message.audioUrl!),
                         ),
@@ -187,8 +201,8 @@ class _MessageBubbleState extends State<MessageBubble> {
                         style: TextStyle(
                           fontSize: 10,
                           color: widget.isMe
-                              ? Colors.white70
-                              : Colors.black54,
+                              ? (widget.myTextColor?.withOpacity(0.7) ?? Colors.white70)
+                              : (widget.otherTextColor?.withOpacity(0.7) ?? Colors.black54),
                         ),
                       ),
                       if (widget.isMe) ...[
