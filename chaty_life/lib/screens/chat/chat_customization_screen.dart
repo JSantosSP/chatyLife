@@ -448,7 +448,7 @@ class _ChatCustomizationScreenState extends State<ChatCustomizationScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: _otherBubbleColor ?? Colors.grey[300],
+                          color: _otherBubbleColor ?? const Color(0xFF00FF80).withOpacity(0.3), // Verde eléctrico suave
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
@@ -474,7 +474,7 @@ class _ChatCustomizationScreenState extends State<ChatCustomizationScreen> {
                 subtitle: Text(
                   _myBubbleColor != null
                       ? 'Color personalizado'
-                      : 'Color por defecto (Morado)',
+                      : 'Color por defecto (Azul eléctrico)',
                 ),
                 trailing: _myBubbleColor != null
                     ? Container(

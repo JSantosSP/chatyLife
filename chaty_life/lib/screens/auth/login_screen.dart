@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Icon(
                     Icons.chat_bubble_outline,
                     size: 80,
-                    color: Colors.deepPurple,
+                    color: Color(0xFF0080FF), // Azul eléctrico
                   ),
                   const SizedBox(height: 32),
                   const Text(

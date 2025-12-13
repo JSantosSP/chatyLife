@@ -64,7 +64,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   const Icon(
                     Icons.lock_reset,
                     size: 80,
-                    color: Colors.deepPurple,
+                    color: Color(0xFF0080FF), // Azul eléctrico
                   ),
                   const SizedBox(height: 32),
                   const Text(
@@ -80,7 +80,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade100,
+                        color: const Color(0xFF00FF80).withOpacity(0.2), // Verde eléctrico con transparencia
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(

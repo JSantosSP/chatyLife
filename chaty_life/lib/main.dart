@@ -45,8 +45,27 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ChatyLife',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF0080FF), // Azul eléctrico
+          brightness: Brightness.light,
+        ),
         useMaterial3: true,
+        primaryColor: const Color(0xFF0080FF), // Azul eléctrico
+        primarySwatch: MaterialColor(
+          0xFF0080FF,
+          <int, Color>{
+            50: const Color(0xFFE6F2FF),
+            100: const Color(0xFFCCE5FF),
+            200: const Color(0xFF99CBFF),
+            300: const Color(0xFF66B1FF),
+            400: const Color(0xFF3397FF),
+            500: const Color(0xFF0080FF), // Azul eléctrico principal
+            600: const Color(0xFF0066CC),
+            700: const Color(0xFF004D99),
+            800: const Color(0xFF003366),
+            900: const Color(0xFF001A33),
+          },
+        ),
       ),
       home: const AuthWrapper(),
       routes: {

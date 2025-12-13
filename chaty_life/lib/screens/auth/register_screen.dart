@@ -79,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const Icon(
                     Icons.person_add,
                     size: 80,
-                    color: Colors.deepPurple,
+                    color: Color(0xFF0080FF), // Azul eléctrico
                   ),
                   const SizedBox(height: 32),
                   const Text(
