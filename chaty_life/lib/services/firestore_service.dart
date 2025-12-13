@@ -223,8 +223,11 @@ class FirestoreService {
     // Actualizar último mensaje del chat
     await updateChatLastMessage(message.chatId, message.content, message.timestamp);
     
-    // Incrementar contador de no leídos
-    await incrementUnreadCount(message.chatId, message.receiverId);
+    // Solo incrementar contador de no leídos si el receptor NO está viendo el chat
+    final isReceiverActive = await isUserActiveInChat(message.receiverId, message.chatId);
+    if (!isReceiverActive) {
+      await incrementUnreadCount(message.chatId, message.receiverId);
+    }
   }
 
   Stream<List<MessageModel>> getMessages(String chatId) {
@@ -300,4 +303,3 @@ class FirestoreService {
     return doc.exists;
   }
 }
-
