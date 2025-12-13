@@ -223,11 +223,10 @@ class FirestoreService {
     // Actualizar último mensaje del chat
     await updateChatLastMessage(message.chatId, message.content, message.timestamp);
     
-    // Solo incrementar contador de no leídos si el receptor NO está viendo el chat
-    final isReceiverActive = await isUserActiveInChat(message.receiverId, message.chatId);
-    if (!isReceiverActive) {
-      await incrementUnreadCount(message.chatId, message.receiverId);
-    }
+    // Incrementar contador de no leídos para el receptor
+    // La Cloud Function verificará si el receptor está activo antes de enviar la notificación
+    // El contador se reseteará automáticamente cuando el receptor entre al chat
+    await incrementUnreadCount(message.chatId, message.receiverId);
   }
 
   Stream<List<MessageModel>> getMessages(String chatId) {

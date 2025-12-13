@@ -124,21 +124,38 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _sendTextMessage() async {
-    if (_messageController.text.trim().isEmpty) return;
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    // Limpiar el campo inmediatamente para mejor UX
+    _messageController.clear();
+    if (mounted) {
+      setState(() {});
+    }
 
     final message = MessageModel(
       id: const Uuid().v4(),
       chatId: widget.chatId,
       senderId: widget.currentUserId,
       receiverId: widget.contactUser?.uid ?? '',
-      content: _messageController.text.trim(),
+      content: text,
       type: MessageType.text,
       timestamp: DateTime.now(),
     );
 
-    await _firestoreService.sendMessage(message);
-    _messageController.clear();
-    _scrollToBottom();
+    try {
+      await _firestoreService.sendMessage(message);
+      _scrollToBottom();
+    } catch (e) {
+      // Si hay error, restaurar el texto
+      if (mounted) {
+        _messageController.text = text;
+        setState(() {});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al enviar mensaje: ${e.toString()}')),
+        );
+      }
+    }
   }
 
   Future<void> _sendImage() async {
