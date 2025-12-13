@@ -251,7 +251,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF0080FF), // Azul eléctrico
+                                color: const Color(0xFF00549E), // Azul eléctrico
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -284,7 +284,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
             ),
           );
         },
-        backgroundColor: const Color(0xFF00FF80), // Verde eléctrico
+        backgroundColor: const Color(0xFF00944F), // Verde eléctrico
         foregroundColor: Colors.white,
         child: const Icon(Icons.add),
         tooltip: 'Buscar contactos',

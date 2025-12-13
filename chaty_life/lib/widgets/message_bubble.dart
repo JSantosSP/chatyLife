@@ -102,7 +102,7 @@ class _MessageBubbleState extends State<MessageBubble> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: widget.isMe 
-                    ? (widget.myBubbleColor ?? const Color(0xFF0080FF)) // Azul eléctrico
+                    ? (widget.myBubbleColor ?? const Color(0xFF00549E)) // Azul eléctrico
                     : (widget.otherBubbleColor ?? Colors.grey[300]),
                 borderRadius: BorderRadius.circular(16),
               ),

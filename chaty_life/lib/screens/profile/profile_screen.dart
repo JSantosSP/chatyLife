@@ -134,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   right: 0,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0080FF), // Azul eléctrico
+                      color: const Color(0xFF00549E), // Azul eléctrico
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),

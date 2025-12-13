@@ -132,20 +132,20 @@ class _MyAppState extends State<MyApp> {
   ThemeData _buildLightTheme() {
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF0080FF), // Azul eléctrico
+        seedColor: const Color(0xFF00549E), // Azul eléctrico
         brightness: Brightness.light,
       ),
       useMaterial3: true,
-      primaryColor: const Color(0xFF0080FF), // Azul eléctrico
+      primaryColor: const Color(0xFF00549E), // Azul eléctrico
       primarySwatch: MaterialColor(
-        0xFF0080FF,
+        0xFF00549E,
         <int, Color>{
           50: const Color(0xFFE6F2FF),
           100: const Color(0xFFCCE5FF),
           200: const Color(0xFF99CBFF),
           300: const Color(0xFF66B1FF),
           400: const Color(0xFF3397FF),
-          500: const Color(0xFF0080FF), // Azul eléctrico principal
+          500: const Color(0xFF00549E), // Azul eléctrico principal
           600: const Color(0xFF0066CC),
           700: const Color(0xFF004D99),
           800: const Color(0xFF003366),
@@ -154,13 +154,13 @@ class _MyAppState extends State<MyApp> {
       ),
       scaffoldBackgroundColor: const Color(0xFFFEEDCE),
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF0080FF), // Azul eléctrico
+        backgroundColor: Color(0xFF00549E), // Azul eléctrico
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF0080FF), // Azul eléctrico
+          backgroundColor: const Color(0xFF00549E), // Azul eléctrico
           foregroundColor: Colors.white,
         ),
       ),
@@ -170,11 +170,11 @@ class _MyAppState extends State<MyApp> {
   ThemeData _buildDarkTheme() {
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF0080FF), // Azul eléctrico
+        seedColor: const Color(0xFF00549E), // Azul eléctrico
         brightness: Brightness.dark,
       ),
       useMaterial3: true,
-      primaryColor: const Color(0xFF0080FF), // Azul eléctrico
+      primaryColor: const Color(0xFF00549E), // Azul eléctrico
       scaffoldBackgroundColor: const Color(0xFF121B28),
       cardColor: const Color(0xFF1A2332),
       dividerColor: Colors.grey[800],
@@ -193,7 +193,7 @@ class _MyAppState extends State<MyApp> {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF0080FF), // Azul eléctrico
+          backgroundColor: const Color(0xFF00549E), // Azul eléctrico
           foregroundColor: Colors.white,
         ),
       ),
