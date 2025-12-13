@@ -175,17 +175,17 @@ class _MyAppState extends State<MyApp> {
       ),
       useMaterial3: true,
       primaryColor: const Color(0xFF0080FF), // Azul eléctrico
-      scaffoldBackgroundColor: const Color(0xFF121212),
-      cardColor: const Color(0xFF1E1E1E),
+      scaffoldBackgroundColor: const Color(0xFF121B28),
+      cardColor: const Color(0xFF1A2332),
       dividerColor: Colors.grey[800],
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1E1E1E),
+        backgroundColor: Color(0xFF1A2332),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF1E1E1E),
+        fillColor: const Color(0xFF1A2332),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: Color(0xFF00FF80), // Verde eléctrico

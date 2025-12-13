@@ -3,6 +3,7 @@ import '../../services/auth_service.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 import '../chats/chats_screen.dart';
+import '../../main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -87,10 +88,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Image.asset(
-                    'assets/images/icon.png',
-                    width: 80,
-                    height: 80,
+                  ValueListenableBuilder<bool>(
+                    valueListenable: themeNotifier,
+                    builder: (context, isDarkMode, child) {
+                      return Image.asset(
+                        isDarkMode 
+                            ? 'assets/images/icon_dark.png'
+                            : 'assets/images/icon.png',
+                        width: 80,
+                        height: 80,
+                      );
+                    },
                   ),
                   const SizedBox(height: 32),
                   const Text(
