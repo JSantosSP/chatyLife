@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
+import '../../services/theme_service.dart';
 import '../../models/user_model.dart';
 import '../../models/chat_model.dart';
 import '../../widgets/profile_avatar.dart';
 import '../chat/chat_screen.dart';
 import '../profile/profile_screen.dart';
 import '../contacts/contacts_screen.dart';
+import '../../main.dart';
 
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({super.key});
@@ -19,6 +21,7 @@ class ChatsScreen extends StatefulWidget {
 class _ChatsScreenState extends State<ChatsScreen> {
   final _authService = AuthService();
   final _firestoreService = FirestoreService();
+  final _themeService = ThemeService();
   UserModel? _currentUser;
 
   @override
@@ -96,6 +99,25 @@ class _ChatsScreenState extends State<ChatsScreen> {
       appBar: AppBar(
         title: const Text('Chats'),
         actions: [
+          ValueListenableBuilder<bool>(
+            valueListenable: themeNotifier,
+            builder: (context, isDarkMode, child) {
+              return IconButton(
+                icon: Icon(
+                  isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                  color: isDarkMode 
+                      ? Colors.amber // Amarillo para luna en modo oscuro
+                      : Colors.orange, // Naranja para sol en modo claro
+                ),
+                onPressed: () async {
+                  final newMode = !isDarkMode;
+                  await _themeService.saveThemeMode(newMode);
+                  themeNotifier.value = newMode;
+                },
+                tooltip: isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro',
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {

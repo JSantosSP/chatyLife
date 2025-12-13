@@ -5,7 +5,9 @@ import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
 import '../../services/storage_service.dart';
+import '../../services/theme_service.dart';
 import '../../widgets/profile_avatar.dart';
+import '../../main.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserModel? currentUser;
@@ -20,14 +22,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _authService = AuthService();
   final _firestoreService = FirestoreService();
   final _storageService = StorageService();
+  final _themeService = ThemeService();
   UserModel? _user;
   bool _isUpdatingPhoto = false;
+  bool _isDarkMode = false;
 
   @override
   void initState() {
     super.initState();
     _user = widget.currentUser;
     _loadUser();
+    _loadThemeMode();
+  }
+
+  Future<void> _loadThemeMode() async {
+    final isDark = await _themeService.loadThemeMode();
+    if (mounted) {
+      setState(() => _isDarkMode = isDark);
+    }
+  }
+
+  Future<void> _toggleTheme(bool value) async {
+    setState(() => _isDarkMode = value);
+    await _themeService.saveThemeMode(value);
+    // Actualizar el ValueNotifier global para que MyApp se reconstruya
+    themeNotifier.value = value;
   }
 
   Future<void> _loadUser() async {
@@ -167,6 +186,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 title: const Text('Miembro desde'),
                 subtitle: Text(
                   '${_user!.createdAt.day}/${_user!.createdAt.month}/${_user!.createdAt.year}',
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                leading: Icon(_isDarkMode ? Icons.dark_mode : Icons.light_mode),
+                title: const Text('Modo oscuro'),
+                trailing: Switch(
+                  value: _isDarkMode,
+                  onChanged: _toggleTheme,
                 ),
               ),
             ),

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
+import '../../services/theme_service.dart';
 import '../../models/user_model.dart';
 import '../../models/contact_model.dart';
 import '../../widgets/profile_avatar.dart';
 import '../chat/chat_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../main.dart';
 
 class ContactsScreen extends StatefulWidget {
   const ContactsScreen({super.key});
@@ -141,6 +143,26 @@ class _ContactsScreenState extends State<ContactsScreen> {
       appBar: AppBar(
         title: const Text('ChatyLife'),
         actions: [
+          ValueListenableBuilder<bool>(
+            valueListenable: themeNotifier,
+            builder: (context, isDarkMode, child) {
+              return IconButton(
+                icon: Icon(
+                  isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                  color: isDarkMode 
+                      ? Colors.amber // Amarillo para luna en modo oscuro
+                      : Colors.orange, // Naranja para sol en modo claro
+                ),
+                onPressed: () async {
+                  final _themeService = ThemeService();
+                  final newMode = !isDarkMode;
+                  await _themeService.saveThemeMode(newMode);
+                  themeNotifier.value = newMode;
+                },
+                tooltip: isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro',
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {

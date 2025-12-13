@@ -6,9 +6,13 @@ import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 import 'services/firestore_service.dart';
+import 'services/theme_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/chats/chats_screen.dart';
 import 'screens/chat/chat_screen.dart';
+
+// ValueNotifier global para el tema
+final themeNotifier = ValueNotifier<bool>(false);
 
 // Handler para notificaciones en background
 @pragma('vm:entry-point')
@@ -37,40 +41,113 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _themeService = ThemeService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemeMode();
+    // Escuchar cambios en el tema
+    themeNotifier.addListener(_onThemeChanged);
+  }
+
+  @override
+  void dispose() {
+    themeNotifier.removeListener(_onThemeChanged);
+    super.dispose();
+  }
+
+  Future<void> _loadThemeMode() async {
+    final isDark = await _themeService.loadThemeMode();
+    if (mounted) {
+      themeNotifier.value = isDark;
+    }
+  }
+
+  void _onThemeChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ChatyLife',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0080FF), // Azul eléctrico
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        primaryColor: const Color(0xFF0080FF), // Azul eléctrico
-        primarySwatch: MaterialColor(
-          0xFF0080FF,
-          <int, Color>{
-            50: const Color(0xFFE6F2FF),
-            100: const Color(0xFFCCE5FF),
-            200: const Color(0xFF99CBFF),
-            300: const Color(0xFF66B1FF),
-            400: const Color(0xFF3397FF),
-            500: const Color(0xFF0080FF), // Azul eléctrico principal
-            600: const Color(0xFF0066CC),
-            700: const Color(0xFF004D99),
-            800: const Color(0xFF003366),
-            900: const Color(0xFF001A33),
+    return ValueListenableBuilder<bool>(
+      valueListenable: themeNotifier,
+      builder: (context, isDarkMode, child) {
+        return MaterialApp(
+          title: 'ChatyLife',
+          theme: _buildLightTheme(),
+          darkTheme: _buildDarkTheme(),
+          themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          home: const AuthWrapper(),
+          routes: {
+            '/login': (context) => const LoginScreen(),
           },
-        ),
-      ),
-      home: const AuthWrapper(),
-      routes: {
-        '/login': (context) => const LoginScreen(),
+        );
       },
+    );
+  }
+
+  ThemeData _buildLightTheme() {
+    return ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF0080FF), // Azul eléctrico
+        brightness: Brightness.light,
+      ),
+      useMaterial3: true,
+      primaryColor: const Color(0xFF0080FF), // Azul eléctrico
+      primarySwatch: MaterialColor(
+        0xFF0080FF,
+        <int, Color>{
+          50: const Color(0xFFE6F2FF),
+          100: const Color(0xFFCCE5FF),
+          200: const Color(0xFF99CBFF),
+          300: const Color(0xFF66B1FF),
+          400: const Color(0xFF3397FF),
+          500: const Color(0xFF0080FF), // Azul eléctrico principal
+          600: const Color(0xFF0066CC),
+          700: const Color(0xFF004D99),
+          800: const Color(0xFF003366),
+          900: const Color(0xFF001A33),
+        },
+      ),
+      scaffoldBackgroundColor: Colors.white,
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF0080FF), // Azul eléctrico
+        brightness: Brightness.dark,
+      ),
+      useMaterial3: true,
+      primaryColor: const Color(0xFF0080FF), // Azul eléctrico
+      scaffoldBackgroundColor: const Color(0xFF121212),
+      cardColor: const Color(0xFF1E1E1E),
+      dividerColor: Colors.grey[800],
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF1E1E1E),
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF1E1E1E),
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Color(0xFF00FF80), // Verde eléctrico
+        foregroundColor: Colors.white,
+      ),
     );
   }
 }
