@@ -56,9 +56,14 @@ service cloud.firestore {
                          (get(/databases/$(database)/documents/chats/$(chatId)).data.participant1Id == request.auth.uid ||
                           get(/databases/$(database)/documents/chats/$(chatId)).data.participant2Id == request.auth.uid);
         
-        // Solo el remitente puede actualizar sus mensajes (marcar como leído)
+        // El remitente puede actualizar sus mensajes (marcar como leído)
+        // El receptor puede actualizar el mensaje para marcar imagen como descargada
         allow update: if request.auth != null && 
-                         resource.data.senderId == request.auth.uid;
+                         (resource.data.senderId == request.auth.uid ||
+                          // Permitir que el receptor actualice si es participante del chat
+                          (resource.data.receiverId == request.auth.uid &&
+                           (get(/databases/$(database)/documents/chats/$(chatId)).data.participant1Id == request.auth.uid ||
+                            get(/databases/$(database)/documents/chats/$(chatId)).data.participant2Id == request.auth.uid)));
       }
     }
   }

@@ -13,6 +13,7 @@ class MessageModel {
   final String? localAudioPath;
   final DateTime timestamp;
   final bool isRead;
+  final bool imageDownloaded; // Indica si la imagen ya fue descargada
 
   MessageModel({
     required this.id,
@@ -27,6 +28,7 @@ class MessageModel {
     this.localAudioPath,
     required this.timestamp,
     this.isRead = false,
+    this.imageDownloaded = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -41,6 +43,7 @@ class MessageModel {
       'audioUrl': audioUrl,
       'timestamp': timestamp.toIso8601String(),
       'isRead': isRead,
+      'imageDownloaded': imageDownloaded,
     };
   }
 
@@ -61,6 +64,7 @@ class MessageModel {
           ? DateTime.parse(map['timestamp'])
           : DateTime.now(),
       isRead: map['isRead'] ?? false,
+      imageDownloaded: map['imageDownloaded'] ?? false,
     );
   }
 
@@ -77,6 +81,7 @@ class MessageModel {
     String? localAudioPath,
     DateTime? timestamp,
     bool? isRead,
+    bool? imageDownloaded,
   }) {
     return MessageModel(
       id: id ?? this.id,
@@ -91,6 +96,7 @@ class MessageModel {
       localAudioPath: localAudioPath ?? this.localAudioPath,
       timestamp: timestamp ?? this.timestamp,
       isRead: isRead ?? this.isRead,
+      imageDownloaded: imageDownloaded ?? this.imageDownloaded,
     );
   }
 }

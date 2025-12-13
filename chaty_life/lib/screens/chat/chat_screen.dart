@@ -38,6 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isRecording = false;
   bool _showEmojiPicker = false;
   String? _recordingPath;
+  final Set<String> _downloadingImages = {}; // Track imágenes en proceso de descarga
 
   @override
   void initState() {
@@ -213,7 +214,16 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _downloadAndSaveImage(MessageModel message) async {
-    if (message.imageUrl == null || message.localImagePath != null) return;
+    // Verificar si ya fue descargada o está en proceso
+    if (message.imageUrl == null || 
+        message.imageDownloaded || 
+        message.localImagePath != null ||
+        _downloadingImages.contains(message.id)) {
+      return;
+    }
+
+    // Marcar como en proceso
+    _downloadingImages.add(message.id);
 
     try {
       final localPath = await _storageService.downloadAndSaveImage(
@@ -223,16 +233,29 @@ class _ChatScreenState extends State<ChatScreen> {
       );
 
       if (localPath != null && mounted) {
+        // Marcar como descargada en Firestore y eliminar de la nube si es Base64
+        await _firestoreService.markImageAsDownloaded(
+          message.chatId,
+          message.id,
+          message.imageUrl!,
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Imagen guardada en galería')),
+          const SnackBar(
+            content: Text('Imagen guardada en galería'),
+            duration: Duration(seconds: 2),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al descargar: ${e.toString()}')),
+          SnackBar(content: Text('Error al descargar imagen: ${e.toString()}')),
         );
       }
+    } finally {
+      // Remover del set de descargas en proceso
+      _downloadingImages.remove(message.id);
     }
   }
 
@@ -291,9 +314,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     final message = messages[index];
                     final isMe = message.senderId == widget.currentUserId;
                     
-                    // Descargar imagen automáticamente si es recibida
-                    if (!isMe && message.type == MessageType.image && message.localImagePath == null) {
-                      _downloadAndSaveImage(message);
+                    // Descargar imagen automáticamente solo si es recibida, no descargada y no está en proceso
+                    if (!isMe && 
+                        message.type == MessageType.image && 
+                        !message.imageDownloaded &&
+                        !_downloadingImages.contains(message.id)) {
+                      // Usar un pequeño delay para evitar múltiples descargas simultáneas
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        if (mounted) {
+                          _downloadAndSaveImage(message);
+                        }
+                      });
                     }
 
                     return MessageBubble(

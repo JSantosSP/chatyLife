@@ -99,39 +99,62 @@ class _MessageBubbleState extends State<MessageBubble> {
                         color: widget.isMe ? Colors.white : Colors.black87,
                       ),
                     )
-                  else if (widget.message.type == MessageType.image &&
-                      widget.message.imageUrl != null)
+                  else if (widget.message.type == MessageType.image)
                     GestureDetector(
                       onTap: widget.onImageTap,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: widget.message.imageUrl!.startsWith('data:image')
-                            ? Image.memory(
-                                // Decodificar Base64
-                                base64Decode(
-                                  widget.message.imageUrl!.split(',')[1],
-                                ),
-                                width: 200,
-                                height: 200,
-                                fit: BoxFit.cover,
-                              )
-                            : CachedNetworkImage(
-                                imageUrl: widget.message.imageUrl!,
-                                width: 200,
-                                height: 200,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => const SizedBox(
-                                  width: 200,
-                                  height: 200,
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => const Icon(
-                                  Icons.error,
-                                  size: 50,
-                                ),
-                              ),
+                        child: widget.message.imageUrl != null
+                            ? (widget.message.imageUrl!.startsWith('data:image')
+                                ? Image.memory(
+                                    // Decodificar Base64
+                                    base64Decode(
+                                      widget.message.imageUrl!.split(',')[1],
+                                    ),
+                                    width: 200,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  )
+                                : CachedNetworkImage(
+                                    imageUrl: widget.message.imageUrl!,
+                                    width: 200,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => const SizedBox(
+                                      width: 200,
+                                      height: 200,
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => const Icon(
+                                      Icons.error,
+                                      size: 50,
+                                    ),
+                                  ))
+                            : (widget.message.imageDownloaded
+                                ? Container(
+                                    width: 200,
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        color: Colors.green,
+                                        size: 50,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(
+                                    width: 200,
+                                    height: 200,
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  )),
                       ),
                     )
                   else if (widget.message.type == MessageType.audio &&

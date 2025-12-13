@@ -241,5 +241,25 @@ class FirestoreService {
         .doc(messageId)
         .update({'isRead': true});
   }
+
+  // Marcar imagen como descargada y eliminar de la nube si es Base64
+  Future<void> markImageAsDownloaded(String chatId, String messageId, String imageUrl) async {
+    final updates = <String, dynamic>{
+      'imageDownloaded': true,
+    };
+
+    // Si es Base64 (almacenado en Firestore), eliminar la URL para ahorrar espacio
+    if (imageUrl.startsWith('data:image')) {
+      updates['imageUrl'] = FieldValue.delete(); // Eliminar la imagen Base64 del mensaje
+    }
+    // Si es ImgBB, mantener la URL pero marcar como descargada
+
+    await _firestore
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .doc(messageId)
+        .update(updates);
+  }
 }
 
