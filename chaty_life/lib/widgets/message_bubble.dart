@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../models/message_model.dart';
+import 'profile_avatar.dart';
 
 class MessageBubble extends StatefulWidget {
   final MessageModel message;
@@ -15,6 +16,10 @@ class MessageBubble extends StatefulWidget {
   final Color? otherBubbleColor;
   final Color? myTextColor;
   final Color? otherTextColor;
+  final String? currentUserPhoto;
+  final String? currentUsername;
+  final String? contactUserPhoto;
+  final String? contactUsername;
 
   const MessageBubble({
     super.key,
@@ -25,6 +30,10 @@ class MessageBubble extends StatefulWidget {
     this.otherBubbleColor,
     this.myTextColor,
     this.otherTextColor,
+    this.currentUserPhoto,
+    this.currentUsername,
+    this.contactUserPhoto,
+    this.contactUsername,
   });
 
   @override
@@ -81,12 +90,10 @@ class _MessageBubbleState extends State<MessageBubble> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!widget.isMe) ...[
-            CircleAvatar(
+            ProfileAvatar(
+              photoUrl: widget.contactUserPhoto,
+              fallbackText: widget.contactUsername ?? widget.message.senderId,
               radius: 12,
-              child: Text(
-                widget.message.senderId[0].toUpperCase(),
-                style: const TextStyle(fontSize: 10),
-              ),
             ),
             const SizedBox(width: 4),
           ],
@@ -225,12 +232,10 @@ class _MessageBubbleState extends State<MessageBubble> {
           ),
           if (widget.isMe) ...[
             const SizedBox(width: 4),
-            CircleAvatar(
+            ProfileAvatar(
+              photoUrl: widget.currentUserPhoto,
+              fallbackText: widget.currentUsername ?? widget.message.senderId,
               radius: 12,
-              child: Text(
-                widget.message.senderId[0].toUpperCase(),
-                style: const TextStyle(fontSize: 10),
-              ),
             ),
           ],
         ],

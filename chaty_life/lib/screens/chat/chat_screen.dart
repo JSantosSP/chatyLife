@@ -13,6 +13,7 @@ import '../../models/chat_theme_model.dart';
 import '../../services/firestore_service.dart';
 import '../../services/storage_service.dart';
 import '../../services/chat_theme_service.dart';
+import '../../services/auth_service.dart';
 import '../../widgets/message_bubble.dart';
 import '../../widgets/profile_avatar.dart';
 import 'chat_customization_screen.dart';
@@ -38,6 +39,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final _scrollController = ScrollController();
   final _firestoreService = FirestoreService();
   final _storageService = StorageService();
+  final _authService = AuthService();
   final _audioRecorder = FlutterSoundRecorder();
   final _themeService = ChatThemeService();
   bool _isRecording = false;
@@ -45,12 +47,21 @@ class _ChatScreenState extends State<ChatScreen> {
   String? _recordingPath;
   final Set<String> _downloadingImages = {}; // Track imágenes en proceso de descarga
   ChatTheme? _chatTheme;
+  UserModel? _currentUser;
 
   @override
   void initState() {
     super.initState();
     _resetUnreadCount();
     _loadChatTheme();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final user = await _authService.getUserData();
+    if (mounted) {
+      setState(() => _currentUser = user);
+    }
   }
 
   Future<void> _loadChatTheme() async {
@@ -421,6 +432,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         otherBubbleColor: _chatTheme?.otherBubbleColor,
                         myTextColor: _chatTheme?.myTextColor,
                         otherTextColor: _chatTheme?.otherTextColor,
+                        currentUserPhoto: _currentUser?.profilePhotoUrl,
+                        currentUsername: _currentUser?.username,
+                        contactUserPhoto: widget.contactUser?.profilePhotoUrl,
+                        contactUsername: widget.contactUser?.username,
                       );
                     },
                   );

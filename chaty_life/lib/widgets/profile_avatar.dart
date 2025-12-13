@@ -21,18 +21,24 @@ class ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Si no hay foto, mostrar inicial del texto
+    // Si no hay foto, mostrar icono de persona o inicial del texto
     if (photoUrl == null || photoUrl!.isEmpty) {
       return CircleAvatar(
         radius: radius,
         minRadius: minRadius,
         maxRadius: maxRadius,
+        backgroundColor: Colors.grey[300],
         child: fallbackText != null && fallbackText!.isNotEmpty
-            ? Text(
-                fallbackText![0].toUpperCase(),
-                style: TextStyle(fontSize: radius * 0.6),
+            ? Icon(
+                Icons.person,
+                size: radius * 1.2,
+                color: Colors.grey[600],
               )
-            : null,
+            : Icon(
+                Icons.person,
+                size: radius * 1.2,
+                color: Colors.grey[600],
+              ),
       );
     }
 
@@ -51,17 +57,17 @@ class ProfileAvatar extends StatelessWidget {
               : null,
         );
       } catch (e) {
-        // Si hay error decodificando Base64, mostrar fallback
+        // Si hay error decodificando Base64, mostrar icono de persona
         return CircleAvatar(
           radius: radius,
           minRadius: minRadius,
           maxRadius: maxRadius,
-          child: fallbackText != null && fallbackText!.isNotEmpty
-              ? Text(
-                  fallbackText![0].toUpperCase(),
-                  style: TextStyle(fontSize: radius * 0.6),
-                )
-              : null,
+          backgroundColor: Colors.grey[300],
+          child: Icon(
+            Icons.person,
+            size: radius * 1.2,
+            color: Colors.grey[600],
+          ),
         );
       }
     }
