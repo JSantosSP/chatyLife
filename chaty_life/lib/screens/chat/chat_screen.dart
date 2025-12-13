@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_sound/flutter_sound.dart';
@@ -55,6 +56,16 @@ class _ChatScreenState extends State<ChatScreen> {
     _resetUnreadCount();
     _loadChatTheme();
     _loadCurrentUser();
+    // Marcar usuario como activo en este chat (await para asegurar que se cree)
+    _firestoreService.setUserActiveInChat(widget.currentUserId, widget.chatId).then((_) {
+      if (kDebugMode) {
+        print('✅ Usuario marcado como activo en chat: ${widget.chatId}');
+      }
+    }).catchError((error) {
+      if (kDebugMode) {
+        print('❌ Error al marcar usuario como activo: $error');
+      }
+    });
   }
 
   Future<void> _loadCurrentUser() async {
@@ -92,6 +103,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    // Marcar usuario como inactivo en este chat
+    _firestoreService.setUserInactiveInChat(widget.currentUserId, widget.chatId).then((_) {
+      if (kDebugMode) {
+        print('✅ Usuario marcado como inactivo en chat: ${widget.chatId}');
+      }
+    }).catchError((error) {
+      if (kDebugMode) {
+        print('❌ Error al marcar usuario como inactivo: $error');
+      }
+    });
     _messageController.dispose();
     _scrollController.dispose();
     _audioRecorder.closeRecorder();

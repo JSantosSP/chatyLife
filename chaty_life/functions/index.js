@@ -56,6 +56,26 @@ exports.sendMessageNotification = functions.firestore
           return null;
         }
 
+        // Verificar si el usuario receptor está viendo este chat
+        const activeChatDoc = await admin.firestore()
+            .collection("activeChats")
+            .doc(receiverId)
+            .collection("chats")
+            .doc(chatId)
+            .get();
+
+        console.log(`Verificando si usuario ${receiverId} está activo en chat ${chatId}:`, {
+          exists: activeChatDoc.exists,
+          data: activeChatDoc.exists ? activeChatDoc.data() : null,
+        });
+
+        if (activeChatDoc.exists) {
+          console.log(`✅ Usuario ${receiverId} está viendo el chat ${chatId}, no se enviará notificación`);
+          return null;
+        }
+
+        console.log(`📤 Usuario ${receiverId} NO está viendo el chat ${chatId}, se enviará notificación`);
+
         // Obtener información del usuario emisor
         const senderDoc = await admin.firestore()
             .collection("users")
@@ -82,7 +102,6 @@ exports.sendMessageNotification = functions.firestore
           notification: {
             title: notificationTitle,
             body: notificationBody,
-            sound: "default",
           },
           data: {
             chatId: chatId,

@@ -267,5 +267,37 @@ class FirestoreService {
         .doc(messageId)
         .update(updates);
   }
+
+  // Rastrear usuarios activos en chats (para evitar notificaciones cuando están viendo el chat)
+  Future<void> setUserActiveInChat(String userId, String chatId) async {
+    await _firestore
+        .collection('activeChats')
+        .doc(userId)
+        .collection('chats')
+        .doc(chatId)
+        .set({
+      'chatId': chatId,
+      'lastActive': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> setUserInactiveInChat(String userId, String chatId) async {
+    await _firestore
+        .collection('activeChats')
+        .doc(userId)
+        .collection('chats')
+        .doc(chatId)
+        .delete();
+  }
+
+  Future<bool> isUserActiveInChat(String userId, String chatId) async {
+    final doc = await _firestore
+        .collection('activeChats')
+        .doc(userId)
+        .collection('chats')
+        .doc(chatId)
+        .get();
+    return doc.exists;
+  }
 }
 
