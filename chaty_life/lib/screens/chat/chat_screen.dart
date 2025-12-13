@@ -120,6 +120,12 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {}); // Mostrar indicador de carga
 
       final audioFile = File(_recordingPath!);
+      
+      // Verificar que el archivo existe
+      if (!await audioFile.exists()) {
+        throw Exception('El archivo de audio no existe');
+      }
+      
       final audioUrl = await _storageService.uploadTemporaryAudio(
         audioFile,
         widget.chatId,
@@ -150,6 +156,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _startRecording() async {
     try {
+      // Si ya está grabando, no hacer nada
+      if (_isRecording) return;
+      
       // Solicitar permisos
       final status = await Permission.microphone.request();
       if (!status.isGranted) {
@@ -161,17 +170,21 @@ class _ChatScreenState extends State<ChatScreen> {
         return;
       }
 
-      // Abrir el recorder
-      await _audioRecorder.openRecorder();
+      // Abrir el recorder (si ya está abierto, esto no causará error)
+      try {
+        await _audioRecorder.openRecorder();
+      } catch (e) {
+        // Si ya está abierto, continuar
+      }
       
       final appDir = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       _recordingPath = '${appDir.path}/audio_$timestamp.m4a';
 
-      // Iniciar grabación
+      // Iniciar grabación con codec compatible
       await _audioRecorder.startRecorder(
         toFile: _recordingPath,
-        codec: Codec.aacADTS,
+        codec: Codec.aacMP4, // Cambiar a aacMP4 que es más compatible
       );
 
       setState(() => _isRecording = true);
@@ -181,12 +194,27 @@ class _ChatScreenState extends State<ChatScreen> {
           SnackBar(content: Text('Error al grabar: ${e.toString()}')),
         );
       }
+      // Asegurarse de cerrar el recorder si hay error
+      try {
+        await _audioRecorder.closeRecorder();
+      } catch (_) {}
+      setState(() {
+        _isRecording = false;
+        _recordingPath = null;
+      });
     }
   }
 
   Future<void> _stopRecording() async {
     try {
+      // Verificar si está grabando antes de detener
+      if (!_isRecording) return;
+      
       await _audioRecorder.stopRecorder();
+      
+      // Cerrar el recorder después de detener
+      await _audioRecorder.closeRecorder();
+      
       setState(() => _isRecording = false);
 
       if (_recordingPath != null) {
@@ -198,6 +226,14 @@ class _ChatScreenState extends State<ChatScreen> {
           SnackBar(content: Text('Error al detener grabación: ${e.toString()}')),
         );
       }
+      // Asegurarse de cerrar el recorder si hay error
+      try {
+        await _audioRecorder.closeRecorder();
+      } catch (_) {}
+      setState(() {
+        _isRecording = false;
+        _recordingPath = null;
+      });
     }
   }
 
