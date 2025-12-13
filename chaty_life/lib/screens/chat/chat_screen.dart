@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _showEmojiPicker = false;
   String? _recordingPath;
   final Set<String> _downloadingImages = {}; // Track imágenes en proceso de descarga
+  Timer? _unreadCountResetTimer; // Timer para resetear contador periódicamente mientras estás dentro del chat
   ChatTheme? _chatTheme;
   UserModel? _currentUser;
 
@@ -64,6 +66,14 @@ class _ChatScreenState extends State<ChatScreen> {
     }).catchError((error) {
       if (kDebugMode) {
         print('❌ Error al marcar usuario como activo: $error');
+      }
+    });
+    
+    // Resetear contador periódicamente mientras estás dentro del chat
+    // Esto asegura que el contador siempre esté en 0 cuando estás viendo el chat
+    _unreadCountResetTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (mounted) {
+        _firestoreService.resetUnreadCount(widget.chatId, widget.currentUserId);
       }
     });
   }
@@ -103,6 +113,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    // Cancelar timer de reseteo de contador
+    _unreadCountResetTimer?.cancel();
     // Marcar usuario como inactivo en este chat
     _firestoreService.setUserInactiveInChat(widget.currentUserId, widget.chatId).then((_) {
       if (kDebugMode) {
@@ -554,4 +566,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
