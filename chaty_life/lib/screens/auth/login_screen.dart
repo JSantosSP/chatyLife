@@ -40,14 +40,32 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const ChatsScreen()),
           );
+        } else if (mounted) {
+          // Si el usuario es null después de un login exitoso, mostrar error
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error: No se pudo obtener la información del usuario'),
+            ),
+          );
         }
       } catch (e) {
         if (mounted) {
+          // Extraer el mensaje de error de manera más limpia
+          String errorMessage = e.toString();
+          if (errorMessage.startsWith('Exception: ')) {
+            errorMessage = errorMessage.substring(11);
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
           );
         }
       } finally {
+        // Asegurarse de que el loading siempre se detiene
         if (mounted) {
           setState(() => _isLoading = false);
         }
