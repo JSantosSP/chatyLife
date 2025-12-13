@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
+import '../../services/storage_service.dart';
+import '../../widgets/profile_avatar.dart';
 
 class ProfileScreen extends StatefulWidget {
   final UserModel? currentUser;
@@ -15,7 +19,9 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _authService = AuthService();
   final _firestoreService = FirestoreService();
+  final _storageService = StorageService();
   UserModel? _user;
+  bool _isUpdatingPhoto = false;
 
   @override
   void initState() {
@@ -28,6 +34,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = await _authService.getUserData();
     if (mounted) {
       setState(() => _user = user);
+    }
+  }
+
+  Future<void> _selectAndUpdatePhoto() async {
+    try {
+      final picker = ImagePicker();
+      final image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85, // Comprimir un poco
+        maxWidth: 500, // Redimensionar a máximo 500px
+        maxHeight: 500,
+      );
+
+      if (image == null) return;
+
+      setState(() => _isUpdatingPhoto = true);
+
+      final imageFile = File(image.path);
+      final base64Photo = await _storageService.uploadProfilePhotoAsBase64(imageFile);
+
+      // Actualizar en Firestore
+      await _firestoreService.updateProfilePhoto(_user!.uid, base64Photo);
+
+      // Recargar usuario para obtener la foto actualizada
+      await _loadUser();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Foto de perfil actualizada'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al actualizar foto: ${e.toString()}'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUpdatingPhoto = false);
+      }
     }
   }
 
@@ -50,17 +103,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             children: [
             const SizedBox(height: 32),
-            CircleAvatar(
-              radius: 60,
-              backgroundImage: _user!.profilePhotoUrl != null
-                  ? NetworkImage(_user!.profilePhotoUrl!)
-                  : null,
-              child: _user!.profilePhotoUrl == null
-                  ? Text(
-                      _user!.username[0].toUpperCase(),
-                      style: const TextStyle(fontSize: 40),
-                    )
-                  : null,
+            Stack(
+              children: [
+                ProfileAvatar(
+                  photoUrl: _user!.profilePhotoUrl,
+                  fallbackText: _user!.username,
+                  radius: 60,
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: IconButton(
+                      icon: _isUpdatingPhoto
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                      onPressed: _isUpdatingPhoto ? null : _selectAndUpdatePhoto,
+                      tooltip: 'Cambiar foto de perfil',
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
             Text(

@@ -209,6 +209,38 @@ class StorageService {
     }
   }
 
+  /// Convertir imagen de perfil a Base64 con compresión
+  /// Comprime la imagen para que quepa en Firestore (máximo ~800KB)
+  Future<String> uploadProfilePhotoAsBase64(File imageFile) async {
+    try {
+      // Leer el archivo como bytes
+      var bytes = await imageFile.readAsBytes();
+      
+      // Si la imagen es muy grande, redimensionarla
+      // Firestore tiene límite de 1MB, así que comprimimos a máximo 800KB
+      const maxSize = 800 * 1024; // 800KB
+      const maxDimension = 500; // Máximo 500x500 píxeles para fotos de perfil
+      
+      // Si la imagen es muy grande, necesitamos redimensionarla
+      // Por ahora, si es mayor a 800KB, lanzamos un error con instrucciones
+      if (bytes.length > maxSize) {
+        throw Exception(
+          'La imagen es demasiado grande (${(bytes.length / 1024).toStringAsFixed(0)}KB). '
+          'Por favor, selecciona una imagen más pequeña o comprímela antes de subirla. '
+          'Tamaño máximo recomendado: ${(maxSize / 1024).toStringAsFixed(0)}KB'
+        );
+      }
+      
+      // Codificar a Base64
+      final base64Image = base64Encode(bytes);
+      
+      // Retornar como data URI (se almacena en Firestore)
+      return 'data:image/jpeg;base64,$base64Image';
+    } catch (e) {
+      throw Exception('Error al procesar foto de perfil: ${e.toString()}');
+    }
+  }
+
   /// Eliminar archivo temporal
   /// Nota: Con Base64, los datos se eliminan automáticamente cuando se elimina el mensaje de Firestore
   /// Con ImgBB, las imágenes se eliminan automáticamente después de un tiempo

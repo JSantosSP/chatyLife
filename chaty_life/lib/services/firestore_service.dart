@@ -25,6 +25,12 @@ class FirestoreService {
     await _firestore.collection('users').doc(uid).update(data);
   }
 
+  Future<void> updateProfilePhoto(String uid, String photoBase64) async {
+    await _firestore.collection('users').doc(uid).update({
+      'profilePhotoUrl': photoBase64,
+    });
+  }
+
   Future<List<UserModel>> searchUsersByUsername(String username) async {
     final query = await _firestore
         .collection('users')

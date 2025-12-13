@@ -14,6 +14,7 @@ import '../../services/firestore_service.dart';
 import '../../services/storage_service.dart';
 import '../../services/chat_theme_service.dart';
 import '../../widgets/message_bubble.dart';
+import '../../widgets/profile_avatar.dart';
 import 'chat_customization_screen.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -338,15 +339,10 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            CircleAvatar(
-              backgroundImage: widget.contactUser?.profilePhotoUrl != null
-                  ? NetworkImage(widget.contactUser!.profilePhotoUrl!)
-                  : null,
-              child: widget.contactUser?.profilePhotoUrl == null
-                  ? Text(
-                      widget.contactUser?.username[0].toUpperCase() ?? 'U',
-                    )
-                  : null,
+            ProfileAvatar(
+              photoUrl: widget.contactUser?.profilePhotoUrl,
+              fallbackText: widget.contactUser?.username ?? 'U',
+              radius: 20,
             ),
             const SizedBox(width: 12),
             Text(widget.contactUser?.username ?? 'Usuario'),

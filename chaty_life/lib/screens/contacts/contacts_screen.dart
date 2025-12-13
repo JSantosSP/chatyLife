@@ -4,6 +4,7 @@ import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
 import '../../models/user_model.dart';
 import '../../models/contact_model.dart';
+import '../../widgets/profile_avatar.dart';
 import '../chat/chat_screen.dart';
 import '../profile/profile_screen.dart';
 
@@ -222,13 +223,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
       itemBuilder: (context, index) {
         final user = _searchResults[index];
         return ListTile(
-          leading: CircleAvatar(
-            backgroundImage: user.profilePhotoUrl != null
-                ? NetworkImage(user.profilePhotoUrl!)
-                : null,
-            child: user.profilePhotoUrl == null
-                ? Text(user.username[0].toUpperCase())
-                : null,
+          leading: ProfileAvatar(
+            photoUrl: user.profilePhotoUrl,
+            fallbackText: user.username,
+            radius: 20,
           ),
           title: Text(user.username),
           trailing: Row(
@@ -288,13 +286,10 @@ class _ContactsScreenState extends State<ContactsScreen> {
                 }
 
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: contactUser.profilePhotoUrl != null
-                        ? NetworkImage(contactUser.profilePhotoUrl!)
-                        : null,
-                    child: contactUser.profilePhotoUrl == null
-                        ? Text(contactUser.username[0].toUpperCase())
-                        : null,
+                  leading: ProfileAvatar(
+                    photoUrl: contactUser.profilePhotoUrl,
+                    fallbackText: contactUser.username,
+                    radius: 20,
                   ),
                   title: Text(contactUser.username),
                   onTap: () => _openChat(contactUser.uid),
