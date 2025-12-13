@@ -152,7 +152,7 @@ class _MyAppState extends State<MyApp> {
           900: const Color(0xFF001A33),
         },
       ),
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: const Color(0xFFFEEDCE),
     );
   }
 

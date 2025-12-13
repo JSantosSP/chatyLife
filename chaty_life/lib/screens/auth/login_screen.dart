@@ -69,10 +69,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(
-                    Icons.chat_bubble_outline,
-                    size: 80,
-                    color: Color(0xFF0080FF), // Azul eléctrico
+                  Image.asset(
+                    'assets/images/icon.png',
+                    width: 80,
+                    height: 80,
                   ),
                   const SizedBox(height: 32),
                   const Text(
