@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
-import '../contacts/contacts_screen.dart';
+import '../chats/chats_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (user != null && mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const ContactsScreen()),
+            MaterialPageRoute(builder: (_) => const ChatsScreen()),
           );
         }
       } catch (e) {

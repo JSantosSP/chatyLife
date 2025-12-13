@@ -200,14 +200,6 @@ class _ContactsScreenState extends State<ContactsScreen> {
         ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _searchController.clear();
-          _searchUsers('');
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: const Icon(Icons.search),
-      ),
     );
   }
 

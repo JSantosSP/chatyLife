@@ -7,7 +7,7 @@ import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 import 'services/firestore_service.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/contacts/contacts_screen.dart';
+import 'screens/chats/chats_screen.dart';
 import 'screens/chat/chat_screen.dart';
 
 // Handler para notificaciones en background
@@ -51,7 +51,6 @@ class MyApp extends StatelessWidget {
       home: const AuthWrapper(),
       routes: {
         '/login': (context) => const LoginScreen(),
-        '/contacts': (context) => const ContactsScreen(),
       },
     );
   }
@@ -132,7 +131,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
 
         if (snapshot.hasData) {
-          return const ContactsScreen();
+          return const ChatsScreen();
         }
 
         return const LoginScreen();

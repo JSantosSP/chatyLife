@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
-import '../contacts/contacts_screen.dart';
+import '../chats/chats_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -42,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         if (user != null && mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const ContactsScreen()),
+            MaterialPageRoute(builder: (_) => const ChatsScreen()),
           );
         }
       } catch (e) {
