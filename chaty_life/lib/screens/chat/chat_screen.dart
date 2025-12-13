@@ -341,12 +341,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Obtener los insets del sistema (botones de navegación)
-    final systemPadding = MediaQuery.of(context).padding;
-    final viewInsets = MediaQuery.of(context).viewInsets;
-    
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Ajusta automáticamente cuando aparece el teclado
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Row(
           children: [
@@ -368,7 +364,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
       body: SafeArea(
-        bottom: true, // Respetar el área inferior (botones de navegación)
+        bottom: true,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -380,9 +376,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 : null,
           ),
           child: Column(
-          children: [
-            Expanded(
-              child: StreamBuilder<List<MessageModel>>(
+            children: [
+              Expanded(
+                child: StreamBuilder<List<MessageModel>>(
                 stream: _firestoreService.getMessages(widget.chatId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -442,84 +438,78 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
-          if (_showEmojiPicker)
-            SizedBox(
-              height: 250,
-              child: EmojiPicker(
-                onEmojiSelected: (category, emoji) {
-                  _messageController.text += emoji.emoji;
-                },
-                config: const Config(
-                  height: 256,
-                  checkPlatformCompatibility: true,
-                ),
-              ),
-            ),
-          // Contenedor de entrada de mensajes con padding para teclado y botones de navegación
-          Padding(
-            padding: EdgeInsets.only(
-              bottom: viewInsets.bottom, // Espacio para el teclado cuando está abierto
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                boxShadow: [
-                  BoxShadow(
-                    offset: const Offset(0, -2),
-                    blurRadius: 4,
-                    color: Colors.black.withOpacity(0.1),
+              if (_showEmojiPicker)
+                SizedBox(
+                  height: 250,
+                  child: EmojiPicker(
+                    onEmojiSelected: (category, emoji) {
+                      _messageController.text += emoji.emoji;
+                    },
+                    config: const Config(
+                      height: 256,
+                      checkPlatformCompatibility: true,
+                    ),
                   ),
-                ],
-              ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(_showEmojiPicker ? Icons.keyboard : Icons.emoji_emotions),
-                  onPressed: () {
-                    setState(() => _showEmojiPicker = !_showEmojiPicker);
-                  },
                 ),
-                IconButton(
-                  icon: const Icon(Icons.image),
-                  onPressed: _sendImage,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(0, -2),
+                      blurRadius: 4,
+                      color: Colors.black.withOpacity(0.1),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Escribe un mensaje...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(_showEmojiPicker ? Icons.keyboard : Icons.emoji_emotions),
+                      onPressed: () {
+                        setState(() => _showEmojiPicker = !_showEmojiPicker);
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.image),
+                      onPressed: _sendImage,
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: 'Escribe un mensaje...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                        ),
+                        maxLines: null,
+                        textCapitalization: TextCapitalization.sentences,
                       ),
                     ),
-                    maxLines: null,
-                    textCapitalization: TextCapitalization.sentences,
-                  ),
+                    if (_isRecording)
+                      IconButton(
+                        icon: const Icon(Icons.stop, color: Colors.red),
+                        onPressed: _stopRecording,
+                      )
+                    else
+                      IconButton(
+                        icon: const Icon(Icons.mic),
+                        onPressed: _startRecording,
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: _sendTextMessage,
+                    ),
+                  ],
                 ),
-                if (_isRecording)
-                  IconButton(
-                    icon: const Icon(Icons.stop, color: Colors.red),
-                    onPressed: _stopRecording,
-                  )
-                else
-                  IconButton(
-                    icon: const Icon(Icons.mic),
-                    onPressed: _startRecording,
-                  ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _sendTextMessage,
-                ),
-              ],
-            ),
-            ),
-          ),
-          ],
+              ),
+            ],
           ),
         ),
       ),
