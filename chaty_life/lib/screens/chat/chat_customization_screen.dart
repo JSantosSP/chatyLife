@@ -396,11 +396,13 @@ class _ChatCustomizationScreenState extends State<ChatCustomizationScreen> {
             ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      body: SafeArea(
+        bottom: true, // Respetar el área inferior (botones de navegación)
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // Vista previa
             Container(
               height: 200,
@@ -613,7 +615,8 @@ class _ChatCustomizationScreenState extends State<ChatCustomizationScreen> {
                 foregroundColor: Colors.red,
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

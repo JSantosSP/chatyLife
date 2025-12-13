@@ -59,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
+        bottom: true, // Respetar el área inferior (botones de navegación)
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),

@@ -51,6 +51,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         title: const Text('Recuperar Contraseña'),
       ),
       body: SafeArea(
+        bottom: true, // Respetar el área inferior (botones de navegación)
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),

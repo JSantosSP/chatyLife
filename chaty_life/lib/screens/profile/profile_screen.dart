@@ -43,10 +43,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text('Mi Perfil'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
+      body: SafeArea(
+        bottom: true, // Respetar el área inferior (botones de navegación)
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
             const SizedBox(height: 32),
             CircleAvatar(
               radius: 60,
@@ -93,7 +95,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
